@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AURUM — Gestão de Carteiras</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%230A0A0F%22/%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%224%22%20y1%3D%2254%22%20x2%3D%2252%22%20y2%3D%226%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2310B981%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%231D4ED8%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20d%3D%22M18%2052%20L31%2010%20L44%2052%22%20fill%3D%22none%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3Crect%20x%3D%2223%22%20y%3D%2240%22%20width%3D%224.5%22%20height%3D%2212%22%20rx%3D%221.4%22%20fill%3D%22url(%23g)%22/%3E%3Crect%20x%3D%2229.3%22%20y%3D%2233%22%20width%3D%224.5%22%20height%3D%2219%22%20rx%3D%221.4%22%20fill%3D%22url(%23g)%22/%3E%3Crect%20x%3D%2235.6%22%20y%3D%2226%22%20width%3D%224.5%22%20height%3D%2226%22%20rx%3D%221.4%22%20fill%3D%22url(%23g)%22/%3E%3Cpath%20d%3D%22M31%2021%20L46%209%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22/%3E%3Ccircle%20cx%3D%2247.5%22%20cy%3D%228%22%20r%3D%223.4%22%20fill%3D%22%2310B981%22/%3E%3C/svg%3E" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  :root{
+    --page-bg:#0A0A0F; --surface:#1A1A24; --surface-alt:#22222E; --sidebar-bg:#0C1016;
+    --border-soft:#2B2C38; --silver:rgba(255,255,255,.08); --muted:#8A8F98; --text:#EDEEF0;
+    --green:#10B981; --green-light:#34D399; --blue:#1D4ED8; --blue-light:#3B82F6;
+    --amber:#F59E0B; --red:#EF4444; --red-dark:#F87171;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;background:var(--page-bg);color:var(--text);}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;}
+  button{transition:filter .15s ease,transform .1s ease;font-family:inherit;}
+  button:hover{filter:brightness(1.12);}
+  input,select{font-family:inherit;}
+  input:focus,select:focus{border-color:var(--green)!important;outline:none;}
+  .card{background:var(--surface);border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:24px;box-shadow:0 4px 24px rgba(0,0,0,.35);}
+  .input{background:var(--surface-alt);border:1px solid var(--silver);border-radius:8px;padding:9px 11px;color:var(--text);width:100%;font-size:14px;}
+  .btn-primary{background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;font-size:13px;}
+  .btn-ghost{background:none;border:1px solid var(--silver);color:var(--text);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:12.5px;}
+  .nav-item{display:flex;align-items:center;gap:10px;background:transparent;color:#D7DCE5;border:none;border-left:3px solid transparent;border-radius:8px;padding:10px 12px;cursor:pointer;width:100%;text-align:left;font-size:13px;font-weight:600;transition:background .2s ease,color .2s ease,border-color .2s ease;}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:#F4F7FB;}
+  .nav-item.active{background:rgba(16,185,129,.14);color:#fff;border-left-color:var(--green);}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;padding:10px 14px;color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;background:var(--sidebar-bg);}
+  td{padding:10px 14px;border-bottom:1px solid var(--border-soft);}
+  .loading{display:flex;align-items:center;justify-content:center;height:100vh;color:var(--muted);font-size:14px;padding:24px;text-align:center;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="loading">Carregando o AURUM…<br/><br/><span style="font-size:12px;">Se esta mensagem não sumir em alguns segundos, veja o aviso no final da página.</span></div>
+</div>
+<noscript><div class="loading">Este sistema precisa de JavaScript habilitado no navegador.</div></noscript>
+<div id="ajudaAbertura" style="display:none;position:fixed;bottom:16px;left:16px;right:16px;max-width:640px;margin:0 auto;background:#1A1A24;border:1px solid rgba(239,68,68,.4);border-radius:12px;padding:16px 18px;font-size:12.5px;color:#D7DCE5;">
+  <b style="color:#F87171;">Não carregou?</b> Os motivos mais comuns:<br/>
+  1) Você abriu o arquivo com duplo clique (file://) — navegadores bloqueiam isso por segurança. Publique no Vercel/GitHub Pages ou rode um servidor local (ex: <code>python3 -m http.server</code>) e acesse por http://.<br/>
+  2) O <code>firebaseConfig</code> no topo do arquivo ainda está com valores de exemplo — preencha com os dados reais do seu projeto Firebase.<br/>
+  3) Abra o Console do navegador (F12 → aba Console) pra ver a mensagem de erro exata.
+</div>
+<script>
+  // Script comum (não-módulo) — roda mesmo se o navegador bloquear o script type="module"
+  // logo abaixo (o que acontece, por exemplo, ao abrir o arquivo com duplo clique). Se em
+  // 4 segundos o app ainda não tiver saído da tela de carregamento, mostra o aviso de ajuda.
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      var app = document.getElementById("app");
+      if (app && app.textContent.includes("Carregando o AURUM")) {
+        document.getElementById("ajudaAbertura").style.display = "block";
+      }
+    }, 4000);
+  });
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+  createUserWithEmailAndPassword, signOut,
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot,
+  collection, query, addDoc, orderBy, limit, serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+/* =================================================================
+   CONFIGURAÇÃO DO FIREBASE — preencha com os dados do SEU projeto
+   (Console do Firebase > Configurações do projeto > Seus apps > SDK config)
+================================================================= */
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_PROJETO.firebaseapp.com",
+  projectId: "SEU_PROJETO",
+  storageBucket: "SEU_PROJETO.appspot.com",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID",
+};
+
+/* Qualquer erro não tratado (config inválida, projeto Firebase errado, sem internet)
+   aparece na tela em vez de deixar a página muda/em branco. */
+function mostrarErroFatal(msg){
+  const el = document.getElementById("app");
+  if (el) el.innerHTML = `<div class="loading">
+    <b style="color:#F87171;">Não foi possível iniciar o AURUM.</b><br/><br/>
+    <span style="font-size:12px;">${String(msg).replace(/</g,"&lt;")}</span><br/><br/>
+    <span style="font-size:11.5px;">Confira o firebaseConfig no topo do arquivo, ou abra o Console (F12) para mais detalhes.</span>
+  </div>`;
+}
+window.addEventListener("error", (e) => mostrarErroFatal(e.message));
+window.addEventListener("unhandledrejection", (e) => mostrarErroFatal(e.reason?.message || e.reason));
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ---------------- MÓDULOS POR PAPEL ---------------- */
+const MODULES = [
+  { key:"central",        label:"Central Operacional",       roles:["gestor","consultor"] },
+  { key:"dashboard",       label:"Dashboard (BI)",             roles:["gestor","consultor"] },
+  { key:"carteira",        label:"Carteira de associados",     roles:["gestor","consultor"] },
+  { key:"financeiro",      label:"Financeiro",                 roles:["gestor","consultor"] },
+  { key:"vendas",          label:"Vendas",                      roles:["gestor","consultor"] },
+  { key:"equipe",          label:"Equipe",                      roles:["gestor"] },
+  { key:"metas",           label:"Metas",                       roles:["gestor","consultor"] },
+  { key:"recorrencia",     label:"Recorrência",                 roles:["gestor","consultor"] },
+  { key:"aniversariantes", label:"Aniversariantes",             roles:["gestor","consultor"] },
+  { key:"indicacoes",      label:"Indicações",                  roles:["gestor","consultor"] },
+  { key:"relatorios",      label:"Relatórios",                  roles:["gestor","consultor"] },
+  { key:"admin-usuarios",  label:"Usuários e permissões",       roles:["admin"] },
+  { key:"admin-auditoria", label:"Auditoria",                    roles:["admin"] },
+];
+function modulesForRole(role){ return MODULES.filter(m => m.roles.includes(role)); }
+
+/* ---------------- ÍCONE (monograma AURUM) ---------------- */
+function aurumIcon(size){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="g" x1="4" y1="54" x2="52" y2="6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient></defs>
+    <path d="M18 52 L31 10 L44 52" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="23" y="40" width="4.5" height="12" rx="1.4" fill="url(#g)"/>
+    <rect x="29.3" y="33" width="4.5" height="19" rx="1.4" fill="url(#g)"/>
+    <rect x="35.6" y="26" width="4.5" height="26" rx="1.4" fill="url(#g)"/>
+    <path d="M31 21 L46 9" stroke="url(#g)" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <circle cx="47.5" cy="8" r="3.4" fill="#10B981"/>
+  </svg>`;
+}
+function esc(s){ return (s===null||s===undefined)?"":String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ---------------- ESTADO GLOBAL ---------------- */
+const STATE = {
+  loading: true,
+  user: null,          // objeto do Firebase Auth
+  role: null,           // 'admin' | 'gestor' | 'consultor' | null (ainda sem papel)
+  gestorId: null,
+  tab: "central",
+  modoLogin: "entrar",  // 'entrar' | 'criar'
+  usuarios: [],         // só populado pro admin (onSnapshot em users)
+  auditoria: [],        // só populado pro admin (onSnapshot em auditLog)
+  erro: null,
+  salvandoUid: null,
+};
+let unsubProfile = null, unsubUsuarios = null, unsubAuditoria = null;
+
+/* ---------------- AUTENTICAÇÃO ---------------- */
+onAuthStateChanged(auth, async (firebaseUser) => {
+  unsubProfile?.(); unsubProfile = null;
+  unsubUsuarios?.(); unsubUsuarios = null;
+  unsubAuditoria?.(); unsubAuditoria = null;
+
+  STATE.user = firebaseUser;
+  if (!firebaseUser) {
+    STATE.role = null; STATE.gestorId = null; STATE.loading = false; render();
+    return;
+  }
+
+  const ref = doc(db, "users", firebaseUser.uid);
+  const snap = await getDoc(ref).catch(() => null);
+  if (!snap || !snap.exists()) {
+    await setDoc(ref, { nome: firebaseUser.email, email: firebaseUser.email, role: null, gestorId: null });
+  }
+
+  // Papel lido em tempo real — se um admin promover alguém, reflete na hora.
+  unsubProfile = onSnapshot(ref, (docSnap) => {
+    const data = docSnap.data() || {};
+    STATE.role = data.role ?? null;
+    STATE.gestorId = data.gestorId ?? null;
+    STATE.loading = false;
+    render();
+    if (STATE.role === "admin") ativarListenersAdmin();
+  });
+});
+
+function ativarListenersAdmin(){
+  if (!unsubUsuarios) {
+    unsubUsuarios = onSnapshot(query(collection(db, "users")), (snap) => {
+      STATE.usuarios = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+      render();
+    });
+  }
+  if (!unsubAuditoria) {
+    unsubAuditoria = onSnapshot(query(collection(db, "auditLog"), orderBy("criadoEm", "desc"), limit(200)), (snap) => {
+      STATE.auditoria = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      render();
+    });
+  }
+}
+
+async function login(email, senha){ await signInWithEmailAndPassword(auth, email, senha); }
+async function criarConta(email, senha){ await createUserWithEmailAndPassword(auth, email, senha); }
+async function logout(){ await signOut(auth); }
+
+async function atribuirPapel(uid, role, gestorId){
+  STATE.erro = null; STATE.salvandoUid = uid; render();
+  try{
+    if (role === "consultor" && !gestorId) throw new Error("Selecione um gestor antes de definir alguém como consultor.");
+    await updateDoc(doc(db, "users", uid), { role, gestorId: role === "consultor" ? gestorId : null });
+    await addDoc(collection(db, "auditLog"), {
+      acao: "atribuir_papel", feitoPorUid: STATE.user.uid, feitoPorEmail: STATE.user.email,
+      alvoUid: uid, detalhes: { role, gestorId: role === "consultor" ? gestorId : null },
+      criadoEm: serverTimestamp(),
+    });
+  }catch(e){ STATE.erro = e.message || "Erro ao atualizar papel."; }
+  STATE.salvandoUid = null; render();
+}
+
+/* ---------------- RENDER ---------------- */
+function render(){
+  const app = document.getElementById("app");
+  if (STATE.loading) { app.innerHTML = `<div class="loading">Carregando…</div>`; return; }
+  if (!STATE.user) { app.innerHTML = renderLogin(); return; }
+  if (!STATE.role) { app.innerHTML = renderSemPapel(); return; }
+  app.innerHTML = renderShell();
+}
+
+function renderLogin(){
+  const criar = STATE.modoLogin === "criar";
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;">
+    <form id="loginForm" class="card" style="width:360px;display:flex;flex-direction:column;gap:16px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        ${aurumIcon(32)}<span style="font-size:20px;font-weight:700;">AURUM</span>
+      </div>
+      ${criar ? `<label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--muted);">Nome
+        <input class="input" id="campoNome" /></label>` : ""}
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--muted);">E-mail
+        <input class="input" type="email" id="campoEmail" required /></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--muted);">Senha
+        <input class="input" type="password" id="campoSenha" required minlength="6" /></label>
+      ${STATE.erro ? `<div style="color:var(--red-dark);font-size:12.5px;">${esc(STATE.erro)}</div>` : ""}
+      <button type="submit" class="btn-primary">${criar ? "Criar conta" : "Entrar"}</button>
+      ${criar ? `<div style="font-size:11.5px;color:var(--muted);">Depois de criar a conta, peça ao Administrador Geral pra liberar seu papel de acesso.</div>` : ""}
+      <button type="button" id="alternarModo" style="background:none;border:none;color:var(--muted);font-size:12.5px;cursor:pointer;text-decoration:underline;">
+        ${criar ? "Já tenho conta, entrar" : "Ainda não tenho conta"}
+      </button>
+    </form>
+  </div>`;
+}
+
+function renderSemPapel(){
+  return `<div class="loading">
+    Sua conta (${esc(STATE.user.email)}) ainda não tem um papel (role) atribuído.<br/>
+    Peça para o Administrador Geral liberar seu acesso.<br/><br/>
+    <button class="btn-ghost" id="btnSair">Sair</button>
+  </div>`;
+}
+
+function renderShell(){
+  const modules = modulesForRole(STATE.role);
+  return `
+  <div style="display:flex;min-height:100vh;">
+    <aside style="width:232px;background:var(--sidebar-bg);border-right:1px solid var(--silver);display:flex;flex-direction:column;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;padding:18px 16px;">
+        ${aurumIcon(28)}<span style="color:#fff;font-size:17px;font-weight:700;letter-spacing:.04em;">AURUM</span>
+      </div>
+      <div style="padding:0 16px 14px;color:#C7CEDA;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;">
+        ${STATE.role === "admin" ? "Painel administrativo" : "Gestão de carteira e receitas"}
+      </div>
+      <div style="height:1px;background:rgba(255,255,255,.08);margin:0 16px 10px;"></div>
+      <nav style="display:flex;flex-direction:column;gap:2px;padding:6px 10px;flex:1;">
+        ${modules.map(m => `<button class="nav-item ${STATE.tab === m.key ? "active" : ""}" data-action="setTab" data-tab="${m.key}">${esc(m.label)}</button>`).join("")}
+      </nav>
+      <div style="padding:16px;border-top:1px solid var(--silver);">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${esc(STATE.user.email)}</div>
+        <button class="btn-ghost" style="width:100%;" id="btnSair">Sair</button>
+      </div>
+    </aside>
+    <main style="flex:1;padding:24px;min-width:0;">${renderPagina()}</main>
+  </div>`;
+}
+
+function renderPagina(){
+  if (STATE.tab === "admin-usuarios") return renderAdminUsuarios();
+  if (STATE.tab === "admin-auditoria") return renderAdminAuditoria();
+  const mod = MODULES.find(m => m.key === STATE.tab);
+  return `<div class="card">
+    <h1 style="font-size:22px;font-weight:700;margin:0 0 8px;">${esc(mod ? mod.label : STATE.tab)}</h1>
+    <p style="color:var(--muted);font-size:13.5px;">
+      Este módulo será portado na <b style="color:#fff;">próxima fase</b>. A navegação, o
+      controle de acesso por papel e a autenticação já estão funcionando de verdade —
+      falta só ligar os dados aqui.
+    </p>
+  </div>`;
+}
+
+function renderAdminUsuarios(){
+  const gestores = STATE.usuarios.filter(u => u.role === "gestor");
+  return `<div style="display:flex;flex-direction:column;gap:20px;">
+    <h1 style="font-size:22px;font-weight:700;margin:0;">Usuários e permissões</h1>
+    <div style="font-size:12.5px;color:var(--muted);">Usuários novos aparecem aqui com papel "—" assim que fazem login pela primeira vez.</div>
+    ${STATE.erro ? `<div style="color:var(--red-dark);font-size:13px;">${esc(STATE.erro)}</div>` : ""}
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Gestor vinculado</th></tr></thead>
+        <tbody>
+          ${STATE.usuarios.map(u => `
+            <tr>
+              <td>${esc(u.nome)}</td>
+              <td>${esc(u.email)}</td>
+              <td>
+                <select class="input" style="max-width:180px;" data-action="mudarPapel" data-uid="${u.uid}" ${STATE.salvandoUid === u.uid ? "disabled" : ""}>
+                  <option value="" ${!u.role ? "selected" : ""} disabled>— sem papel —</option>
+                  <option value="admin" ${u.role === "admin" ? "selected" : ""}>Administrador Geral</option>
+                  <option value="gestor" ${u.role === "gestor" ? "selected" : ""}>Gestor</option>
+                  <option value="consultor" ${u.role === "consultor" ? "selected" : ""}>Consultor</option>
+                </select>
+              </td>
+              <td>
+                ${u.role === "consultor" ? `
+                  <select class="input" style="max-width:180px;" data-action="mudarGestor" data-uid="${u.uid}" ${STATE.salvandoUid === u.uid ? "disabled" : ""}>
+                    <option value="">Selecionar…</option>
+                    ${gestores.map(g => `<option value="${g.uid}" ${u.gestorId === g.uid ? "selected" : ""}>${esc(g.nome)}</option>`).join("")}
+                  </select>` : `<span style="color:var(--muted);">—</span>`}
+              </td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderAdminAuditoria(){
+  return `<div style="display:flex;flex-direction:column;gap:20px;">
+    <h1 style="font-size:22px;font-weight:700;margin:0;">Auditoria</h1>
+    <div class="card" style="display:flex;flex-direction:column;gap:8px;">
+      ${STATE.auditoria.length === 0 ? `<div style="color:var(--muted);font-size:13px;">Nenhum registro de auditoria ainda.</div>` :
+        STATE.auditoria.map(e => `
+          <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--surface-alt);border-radius:8px;font-size:12.5px;">
+            <span><b>${esc(e.acao)}</b>${e.alvoUid ? ` — alvo: ${esc(e.alvoUid)}` : ""} <span style="color:var(--muted);">· por ${esc(e.feitoPorEmail || e.feitoPorUid)}</span></span>
+            <span style="color:var(--muted);">${e.criadoEm ? e.criadoEm.toDate().toLocaleString("pt-BR") : "—"}</span>
+          </div>`).join("")}
+    </div>
+  </div>`;
+}
+
+/* ---------------- EVENTOS ---------------- */
+document.addEventListener("submit", async (e) => {
+  if (e.target.id === "loginForm") {
+    e.preventDefault();
+    const email = document.getElementById("campoEmail").value;
+    const senha = document.getElementById("campoSenha").value;
+    STATE.erro = null;
+    try {
+      if (STATE.modoLogin === "criar") await criarConta(email, senha);
+      else await login(email, senha);
+    } catch {
+      STATE.erro = STATE.modoLogin === "criar" ? "Não foi possível criar a conta (e-mail já em uso ou senha fraca)." : "E-mail ou senha inválidos.";
+      render();
+    }
+  }
+});
+
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-action], #alternarModo, #btnSair");
+  if (!t) return;
+  if (t.id === "alternarModo") { STATE.modoLogin = STATE.modoLogin === "entrar" ? "criar" : "entrar"; STATE.erro = null; render(); return; }
+  if (t.id === "btnSair") { logout(); return; }
+  const action = t.getAttribute("data-action");
+  if (action === "setTab") { STATE.tab = t.getAttribute("data-tab"); render(); return; }
+});
+
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  const action = t.getAttribute("data-action");
+  if (action === "mudarPapel") {
+    const uid = t.getAttribute("data-uid");
+    const usuario = STATE.usuarios.find(u => u.uid === uid);
+    atribuirPapel(uid, t.value, usuario?.gestorId || null);
+  }
+  if (action === "mudarGestor") {
+    const uid = t.getAttribute("data-uid");
+    atribuirPapel(uid, "consultor", t.value || null);
+  }
+});
+
+render();
+</script>
+</body>
+</html>
